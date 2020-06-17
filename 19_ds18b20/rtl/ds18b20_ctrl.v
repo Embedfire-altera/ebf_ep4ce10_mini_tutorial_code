@@ -128,7 +128,7 @@ always@(posedge clk_1us or  negedge sys_rst_n)
         case(state)
     //初始化最小时间为960us
        S_INIT:  //收到存在脉冲且时间需大于960us跳转
-            if(cnt_1us == 20'd999 /* && flag_pulse == 1'b1 */)
+            if(cnt_1us == 20'd999  && flag_pulse == 1'b1 )
                 state   <=  S_WR_CMD;
             else
                 state   <=  S_INIT;
@@ -143,7 +143,7 @@ always@(posedge clk_1us or  negedge sys_rst_n)
             else
                 state   <=  S_WAIT;
         S_INIT_AGAIN:   //再次初始化后跳转
-            if(cnt_1us == 20'd999 /* && flag_pulse == 1'b1 */)
+            if(cnt_1us == 20'd999  && flag_pulse == 1'b1 )
                 state   <=  S_RD_CMD;
             else
                 state   <=  S_INIT_AGAIN;
