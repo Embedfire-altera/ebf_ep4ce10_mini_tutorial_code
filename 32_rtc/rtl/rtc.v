@@ -38,7 +38,7 @@ module  rtc
 
 //parameter define
 //设置实时时钟初始值分别为：年_月_日_时_分_秒
-parameter   TIME_INIT   =   48'h20_06_08_08_00_00;
+parameter   TIME_INIT   =   48'h19_09_09_16_15_20;
 
 //wire  define
 wire            i2c_clk     ;   //i2c驱动时钟
@@ -84,7 +84,7 @@ seg_595_bcd     seg_595_bcd_inst
 (
     .sys_clk     (sys_clk  ), //系统时钟，频率50MHz
     .sys_rst_n   (sys_rst_n), //复位信号，低有效
-    .num         (data_out ), //数码管要显示的bcd码数值
+    .data_bcd    (data_out ), //数码管要显示的bcd码数值
     .point       (6'b010100), //小数点显示,高电平有效
     .seg_en      (1'b1     ), //数码管使能信号，高电平有效
 
