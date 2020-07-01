@@ -6,7 +6,7 @@
 // Project Name  : tft_colorbar
 // Target Devices: Altera EP4CE10F17C8N
 // Tool Versions : Quartus 13.0
-// Description   : tft_lcd控制模块
+// Description   : tft_lcd控制模块（5寸、7寸屏）
 // 
 // Revision      : V1.0
 // Additional Comments:
@@ -23,14 +23,14 @@ module  tft_ctrl
     input   wire            sys_rst_n   ,   //系统复位,低电平有效
     input   wire    [15:0]  pix_data    ,   //待显示数据
 
-    output  wire    [9:0]   pix_x       ,   //输出TFT有效显示区域像素点X轴坐标
-    output  wire    [9:0]   pix_y       ,   //输出TFT有效显示区域像素点Y轴坐标
-    output  wire    [15:0]  rgb_tft     ,   //TFT显示数据
-    output  wire            hsync       ,   //TFT行同步信号
-    output  wire            vsync       ,   //TFT场同步信号
-    output  wire            tft_clk     ,   //TFT像素时钟
-    output  wire            tft_de      ,   //TFT数据使能
-    output  wire            tft_bl          //TFT背光信号
+    output  wire    [10:0]   pix_x       ,   //输出TFT有效显示区域像素点X轴坐标
+    output  wire    [10:0]   pix_y       ,   //输出TFT有效显示区域像素点Y轴坐标
+    output  wire    [15:0]   rgb_tft     ,   //TFT显示数据
+    output  wire             hsync       ,   //TFT行同步信号
+    output  wire             vsync       ,   //TFT场同步信号
+    output  wire             tft_clk     ,   //TFT像素时钟
+    output  wire             tft_de      ,   //TFT数据使能
+    output  wire             tft_bl          //TFT背光信号
 );
 
 //********************************************************************//
@@ -38,24 +38,25 @@ module  tft_ctrl
 //********************************************************************//
 
 //parameter define
-parameter H_SYNC    =   10'd41  ,   //行同步
-          H_BACK    =   10'd2   ,   //行时序后沿
-          H_VALID   =   10'd480 ,   //行有效数据
-          H_FRONT   =   10'd2   ,   //行时序前沿
-          H_TOTAL   =   10'd525 ;   //行扫描周期
-parameter V_SYNC    =   10'd10  ,   //场同步
-          V_BACK    =   10'd2   ,   //场时序后沿
-          V_VALID   =   10'd272 ,   //场有效数据
-          V_FRONT   =   10'd2   ,   //场时序前沿
-          V_TOTAL   =   10'd286 ;   //场扫描周期
+parameter H_SYNC    =   11'd1    ,   //行同步
+          H_BACK    =   11'd46   ,   //行时序后沿
+          H_VALID   =   11'd800  ,   //行有效数据
+          H_FRONT   =   11'd210  ,   //行时序前沿
+          H_TOTAL   =   11'd1057 ;   //行扫描周期
+
+parameter V_SYNC    =   11'd1    ,   //场同步
+          V_BACK    =   11'd23   ,   //场时序后沿
+          V_VALID   =   11'd480  ,   //场有效数据
+          V_FRONT   =   11'd22   ,   //场时序前沿
+          V_TOTAL   =   11'd526  ;   //场扫描周期
 
 //wire  define
 wire            rgb_valid       ;   //VGA有效显示区域
 wire            pix_data_req    ;   //像素点色彩信息请求信号
 
 //reg   define
-reg     [9:0]   cnt_h   ;   //行扫描计数器
-reg     [9:0]   cnt_v   ;   //场扫描计数器
+reg     [10:0]   cnt_h   ;   //行扫描计数器
+reg     [10:0]   cnt_v   ;   //场扫描计数器
 
 //********************************************************************//
 //***************************** Main Code ****************************//
@@ -69,9 +70,9 @@ assign  tft_bl  = sys_rst_n     ;
 //cnt_h:行同步信号计数器
 always@(posedge tft_clk_9m or  negedge sys_rst_n)
     if(sys_rst_n == 1'b0)
-        cnt_h   <=  10'd0   ;
+        cnt_h   <=  11'd0   ;
     else    if(cnt_h == H_TOTAL - 1'd1)
-        cnt_h   <=  10'd0   ;
+        cnt_h   <=  11'd0   ;
     else
         cnt_h   <=  cnt_h + 1'd1   ;
 
@@ -81,9 +82,9 @@ assign  hsync = (cnt_h  <=  H_SYNC - 1'd1) ? 1'b1 : 1'b0  ;
 //cnt_v:场同步信号计数器
 always@(posedge tft_clk_9m or  negedge sys_rst_n)
     if(sys_rst_n == 1'b0)
-        cnt_v   <=  10'd0 ;
+        cnt_v   <=  11'd0 ;
     else    if((cnt_v == V_TOTAL - 1'd1) &&  (cnt_h == H_TOTAL-1'd1))
-        cnt_v   <=  10'd0 ;
+        cnt_v   <=  11'd0 ;
     else    if(cnt_h == H_TOTAL - 1'd1)
         cnt_v   <=  cnt_v + 1'd1 ;
     else
@@ -108,9 +109,9 @@ assign  pix_data_req = (((cnt_h >= H_SYNC + H_BACK - 1'b1)
 
 //pix_x,pix_y:VGA有效显示区域像素点坐标
 assign  pix_x = (pix_data_req == 1'b1)
-                ? (cnt_h - (H_SYNC + H_BACK - 1'b1)) : 10'h3ff;
+                ? (cnt_h - (H_SYNC + H_BACK - 1'b1)) : 11'h3ff;
 assign  pix_y = (pix_data_req == 1'b1)
-                ? (cnt_v - (V_SYNC + V_BACK )) : 10'h3ff;
+                ? (cnt_v - (V_SYNC + V_BACK )) : 11'h3ff;
 
 //rgb_tft:输出像素点色彩信息
 assign  rgb_tft = (rgb_valid == 1'b1) ? pix_data : 16'b0 ;
