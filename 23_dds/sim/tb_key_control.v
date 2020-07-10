@@ -2,11 +2,11 @@
 /////////////////////////////////////////////////////////////////////////
 // Author        : EmbedFire
 // Create Date   : 2019/07/10
-// Module Name   : tb_top_dds
+// Module Name   : tb_key_control
 // Project Name  : top_dds
 // Target Devices: Altera EP4CE10F17C8N
 // Tool Versions : Quartus 13.0
-// Description   : DDS信号发生器仿真文件
+// Description   : 按键控制模块仿真文件
 // 
 // Revision      : V1.0
 // Additional Comments:
@@ -17,20 +17,19 @@
 // 淘宝    : https://fire-stm32.taobao.com
 ////////////////////////////////////////////////////////////////////////
 
-module  tb_top_dds();
+module  tb_key_control();
 
 //**************************************************************//
 //*************** Parameter and Internal Signal ****************//
 //**************************************************************//
-parameter   CNT_1MS  = 20'd19000   ,
-            CNT_11MS = 21'd69000   ,
-            CNT_41MS = 22'd149000  ,
-            CNT_51MS = 22'd199000  ,
-            CNT_60MS = 22'd249000  ;
+parameter   CNT_1MS  = 20'd19   ,
+            CNT_11MS = 21'd69   ,
+            CNT_41MS = 22'd149  ,
+            CNT_51MS = 22'd199  ,
+            CNT_60MS = 22'd249  ;
 
 //wire  define
-wire            dac_clk     ;
-wire    [7:0]   dac_data    ;
+wire    [3:0]   wave_select ;
 
 //reg   define
 reg             sys_clk     ;
@@ -41,7 +40,7 @@ reg     [1:0]   cnt_key     ;
 reg     [3:0]   key         ;
 
 //defparam  define
-defparam    top_dds_inst.key_control_inst.CNT_MAX = 24;
+defparam    key_control_inst.CNT_MAX = 24;
 
 //**************************************************************//
 //************************** Main Code *************************//
@@ -49,11 +48,11 @@ defparam    top_dds_inst.key_control_inst.CNT_MAX = 24;
 //sys_rst_n,sys_clk,key
 initial
     begin
+        sys_rst_n   =   1'b0;
         sys_clk     =   1'b0;
-        sys_rst_n   <=   1'b0;
-        key <= 4'b0000;
+        key = 4'b0000;
         #200;
-        sys_rst_n   <=   1'b1;
+        sys_rst_n   =   1'b1;
     end
 
 always #10 sys_clk = ~sys_clk;
@@ -102,15 +101,14 @@ always@(posedge sys_clk or negedge sys_rst_n)
 //**************************************************************//
 //************************ Instantiation ***********************//
 //**************************************************************//
-//------------- top_dds_inst -------------
-top_dds top_dds_inst
+//------------- key_control_inst -------------
+key_control     key_control_inst
 (
-    .sys_clk    (sys_clk    ),
-    .sys_rst_n  (sys_rst_n  ),
-    .key        (key        ),
-
-    .dac_clk    (dac_clk    ),
-    .dac_data   (dac_data   )
+    .sys_clk     (sys_clk    ),   //系统时钟,50MHz
+    .sys_rst_n   (sys_rst_n  ),   //复位信号,低电平有效
+    .key         (key        ),   //输入4位按键
+                  
+    .wave_select (wave_select)    //输出波形选择
 );
 
 endmodule
