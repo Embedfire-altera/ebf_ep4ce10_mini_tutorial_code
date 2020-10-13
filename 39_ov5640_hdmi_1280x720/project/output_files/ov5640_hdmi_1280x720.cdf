@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(EP4CE10F17) Path("E:/ZT_Mini/base_code/53_ov5640_hdmi_1280x720/project/output_files/") File("ov5640_hdmi_1280x720.sof") MfrSpec(OpMask(1));
+		Device PartName(EP4CE10F17) Path("G:/Desktop/FPGA/3.git/Altera/EP4CE10/ebf_ep4ce10_mini_tutorial_code/39_ov5640_hdmi_1280x720/project/output_files/") File("ov5640_hdmi_1280x720.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 
